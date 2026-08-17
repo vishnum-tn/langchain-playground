@@ -21,7 +21,11 @@ def get_llm(provider: str = None):
         return ChatOpenAI(model=os.getenv("OPENAI_MODEL", "gpt-3.5-turbo"), temperature=0.7)
     elif provider == "google":
         from langchain_google_genai import ChatGoogleGenerativeAI
-        return ChatGoogleGenerativeAI(model=os.getenv("GEMINI_MODEL", "gemini-pro"), temperature=0.7)
+        return ChatGoogleGenerativeAI(
+            model=os.getenv("GEMINI_MODEL", "gemini-3.6-flash"),
+            google_api_key=os.getenv("GEMINI_API_KEY"),
+            temperature=0.7,
+        )
     elif provider == "llama.cpp":
         from langchain_openai import ChatOpenAI
         base_url = os.getenv("LLAMA_CPP_URL", "http://127.0.0.1:8080/v1")
@@ -87,3 +91,6 @@ if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 8000))
     uvicorn.run("app:app", host="0.0.0.0", port=port, reload=True)
+    
+
+    
