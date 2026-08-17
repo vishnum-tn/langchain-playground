@@ -18,11 +18,15 @@ def get_llm(provider: str = None):
 
     if provider == "openai":
         from langchain_openai import ChatOpenAI
-        return ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7)
+        return ChatOpenAI(model=os.getenv("OPENAI_MODEL", "gpt-3.5-turbo"), temperature=0.7)
     elif provider == "google":
         from langchain_google_genai import ChatGoogleGenerativeAI
-        return ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.7)
-    else:
+        return ChatGoogleGenerativeAI(model=os.getenv("GEMINI_MODEL", "gemini-pro"), temperature=0.7)
+    elif provider == "llama.cpp":
+        from langchain_openai import ChatOpenAI
+        base_url = os.getenv("LLAMA_CPP_URL", "http://127.0.0.1:8080/v1")
+        return ChatOpenAI(model="local-model", base_url=base_url, api_key="not-needed", temperature=0.7)
+    else:  # ollama
         from langchain_ollama import ChatOllama
         model = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
         base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
@@ -81,4 +85,5 @@ async def clear_history():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run("app:app", host="0.0.0.0", port=port, reload=True)
